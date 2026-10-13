@@ -20,6 +20,9 @@ def  calculate_entropy(password):
     if any(not char.isalnum() for char in password):
         poolSize += 32
 
+    if poolSize == 0:
+        return 0.0,0 
+
     #calculating entropy value
     entropy_val = 0
     entropy_val = len(password) * math.log2(poolSize)
@@ -33,46 +36,51 @@ def  calculate_entropy(password):
 #length
 def checkLength(password):
     if len(password) <= 8: 
-        return False
+        return True
+    return False
 
 #repeated letters
 def checkRepeat(password):
     if bool(re.search(r'(.)\1\1',password)):
-        return False
+        return True
+    return False
 
 #Sequences
 def checkSequences(password):
-    if re.findall(r"\d{4]}", password):
-        return False
+    if re.findall(r"\d{4}", password):
+        return True
+    return False
 
 #Character type
 def checkPoolSize(password):
     entropy, poolSize = calculate_entropy(password)
-    if poolSize[1] == 26 or poolSize[1] ==10 or poolSize[1] == 32:
-        return False
+    if poolSize == 26 or poolSize ==10 or poolSize == 32:
+        return True
+    return False
 
 
 def evaluate_Password(password):
     entropy, poolSize = calculate_entropy(password)
 
     #issues 
-    if (checkLength):
-        issues += "Password less than 8 characters"
-    if (checkRepeat):
-        issues += "Symbol repeats 3 times"
+    issues = []
+    if (checkLength(password)):
+        issues.append( "Password less than 8 characters")
+    if (checkRepeat(password)):
+        issues.append("Symbol repeats 3 times")
     if (checkSequences(password)):
-        issues += "There's a sequence"
+        issues.append("There's a sequence")
     if (checkPoolSize(password)):
-        issues += "Only one character type"
+        issues.append("Only one character type")
 
     #threshold
     if (entropy <= 40):
         rating = "weak"
 
-    if (entropy > 40 & entropy <= 60):
+    if (entropy > 40 and entropy <= 60):
         rating = "fair"
 
     if (entropy > 60):
         rating = "strong"
 
-    return {"entropy": entropy, "rating": rating, "issues": [issues]}   
+    return {"entropy": entropy, "rating": rating, "issues": issues}   
