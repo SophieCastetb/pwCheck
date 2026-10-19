@@ -6,8 +6,27 @@ from pwCheck.strength import (
     checkRepeat,
     checkSequences,
     checkPoolSize,
+    checkCommon,
     evaluate_Password
 )
+
+class TestNewChecks(unittest.TestCase):
+
+    def test_common_password(self):
+        self.assertTrue(checkCommon("Password1"))
+        self.assertFalse(checkCommon("xK9#mQ2$vL7!wR4pZ"))
+
+    def test_common_password_rated_weak(self):
+        result = evaluate_Password("qwertyuiop")
+        self.assertEqual(result["rating"], "weak")
+        self.assertIn("Common password", result["issues"])
+
+    def test_letter_sequence(self):
+        self.assertTrue(checkSequences("xxabcdxx"))
+
+    def test_keyboard_sequence(self):
+        self.assertTrue(checkSequences("myqwerpass"))
+        self.assertFalse(checkSequences("xK9#mQ2$vL"))
 
 class TestCalculateEntropy(unittest.TestCase):
     

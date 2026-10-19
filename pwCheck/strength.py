@@ -1,5 +1,18 @@
 import math
 import re
+from pathlib import Path
+
+COMMON_PATH =Path(__file__).parent / "common_passwords.txt"
+
+def load_common():
+    if COMMON_PATH.exists():
+        return set(COMMON_PATH.read_text(encoding="utf-8").lower().split())
+    return set()
+
+#laods common passwords
+COMMON_PASSWORDS = load_common()
+#things to catch when letters are next to each other on the keyboard
+KEYBOARD_ROWS = ["qwertyuop", "asdfghjkl", "zxcvbnm", "1234567890"]
 
 
 #Entropy estimates how hard a password is to guess : length * log2(pool size)
@@ -47,8 +60,13 @@ def checkRepeat(password):
 
 #Sequences
 def checkSequences(password):
-    if re.findall(r"\d{4}", password):
-        return True
+    p = password.lower()
+    for i in range(len(p)-3):
+        chunk = p[i:i+4]
+        if chunk.isalnum() and all(ord(chunk[j+1])- ord(chunk[j]) == 1 for j in range(3)):
+            return True
+        if any(chunk in row for row in KEYBOARD_ROWS):
+            return True
     return False
 
 #Character type
@@ -58,7 +76,11 @@ def checkPoolSize(password):
         return True
     return False
 
+#checks if it matches the list 
+def checkCommon(password):
+    return password.lower() in COMMON_PASSWORDS
 
+#runs all checks and combines them into one result
 def evaluate_Password(password):
     entropy, poolSize = calculate_entropy(password)
 
@@ -72,6 +94,8 @@ def evaluate_Password(password):
         issues.append("There's a sequence")
     if (checkPoolSize(password)):
         issues.append("Only one character type")
+    if (checkCommon(password)):
+        issues.append("Common password")
 
     #threshold
     if (entropy <= 40):
@@ -83,4 +107,9 @@ def evaluate_Password(password):
     if (entropy > 60):
         rating = "strong"
 
+    #common password is always weak
+    if checkCommon(password):
+        rating = "weak"
+    elif rating == "strong" and issues:
+        rating = "fair"
     return {"entropy": entropy, "rating": rating, "issues": issues}   

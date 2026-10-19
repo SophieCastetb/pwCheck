@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pwcheck"
+version = "0.1.0"
+description = "Password strength checker, breach lookup, and generator"
+requires-python = ">=3.9"
+dependencies = ["requests"]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.scripts]
+pwcheck = "pwCheck.cli:main"
+
+[tool.setuptools]
+packages = ["pwCheck"]
+
+[tool.setuptools.package-data]
+pwCheck = ["*.txt"]

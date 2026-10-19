@@ -1,0 +1,8 @@
+Metadata-Version: 2.4
+Name: pwcheck
+Version: 0.1.0
+Summary: Password strength checker, breach lookup, and generator
+Requires-Python: >=3.9
+Requires-Dist: requests
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
